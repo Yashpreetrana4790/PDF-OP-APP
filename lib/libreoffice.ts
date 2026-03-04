@@ -42,6 +42,14 @@ export async function convertWithLibreOffice(
     const out = await readFile(outPath);
     await unlink(outPath).catch(() => {});
     return out;
+  } catch (err: unknown) {
+    const code = err && typeof err === 'object' && 'code' in err ? (err as NodeJS.ErrnoException).code : '';
+    if (code === 'ENOENT') {
+      throw new Error(
+        'LibreOffice is not installed. Install LibreOffice (https://www.libreoffice.org) and ensure "soffice" is in your PATH to use Word/Excel/PPT conversions.'
+      );
+    }
+    throw err;
   } finally {
     await unlink(inPath).catch(() => {});
     const remaining = await readdir(outDir).catch(() => []);
