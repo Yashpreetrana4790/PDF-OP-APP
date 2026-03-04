@@ -2,9 +2,7 @@ import { notFound } from 'next/navigation';
 import { TOOLS } from '@/lib/tools';
 import ToolClient from './ToolClient';
 
-export async function generateStaticParams() {
-  return TOOLS.map((t) => ({ slug: t.slug }));
-}
+export const dynamic = 'force-dynamic';
 
 export default function ToolPage({ params }: { params: { slug: string } }) {
   const tool = TOOLS.find((t) => t.slug === params.slug);
