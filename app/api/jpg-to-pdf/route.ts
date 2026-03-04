@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PDFDocument } from 'pdf-lib';
-import { getFilesFromFormData, saveUpload } from '@/lib/uploads';
+import { getFilesFromFormData } from '@/lib/uploads';
+import { fileResponse } from '@/lib/response';
 import sharp from 'sharp';
 
 export async function POST(request: NextRequest) {
@@ -25,13 +26,7 @@ export async function POST(request: NextRequest) {
       });
     }
     const outBuf = Buffer.from(await doc.save());
-    const outPath = await saveUpload(outBuf, '-images.pdf');
-    const name = outPath.split(/[/\\]/).pop()!;
-    const baseUrl = request.nextUrl.origin;
-    return NextResponse.json({
-      downloadUrl: `${baseUrl}/api/download?f=${encodeURIComponent(name)}`,
-      filename: 'images-to-pdf.pdf',
-    });
+    return fileResponse(outBuf, 'images-to-pdf.pdf');
   } catch (e) {
     return NextResponse.json({
       error: e instanceof Error ? e.message : 'Conversion failed',

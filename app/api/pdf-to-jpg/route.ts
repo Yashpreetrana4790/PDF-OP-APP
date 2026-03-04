@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getFirstFile, saveUpload } from '@/lib/uploads';
+import { getFirstFile } from '@/lib/uploads';
+import { fileResponse } from '@/lib/response';
 import { PDFDocument } from 'pdf-lib';
 import JSZip from 'jszip';
 
@@ -21,13 +22,7 @@ export async function POST(request: NextRequest) {
       zip.file(`page-${i + 1}.pdf`, pdfBuf);
     }
     const zipBuf = await zip.generateAsync({ type: 'nodebuffer' });
-    const outPath = await saveUpload(Buffer.from(zipBuf), '-pages.zip');
-    const name = outPath.split(/[/\\]/).pop()!;
-    const baseUrl = request.nextUrl.origin;
-    return NextResponse.json({
-      downloadUrl: `${baseUrl}/api/download?f=${encodeURIComponent(name)}`,
-      filename: 'pdf-pages.zip',
-    });
+    return fileResponse(Buffer.from(zipBuf), 'pdf-pages.zip');
   } catch (e) {
     return NextResponse.json({
       error: e instanceof Error ? e.message : 'PDF to image requires external tools. Download as separate PDFs per page instead.',

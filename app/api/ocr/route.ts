@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getFilesFromFormData, saveUpload } from '@/lib/uploads';
+import { getFilesFromFormData } from '@/lib/uploads';
+import { fileResponse } from '@/lib/response';
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import Tesseract from 'tesseract.js';
 import sharp from 'sharp';
@@ -56,13 +57,7 @@ export async function POST(request: NextRequest) {
     }
 
     const outBuf = Buffer.from(await outDoc.save());
-    const outPath = await saveUpload(outBuf, '-ocr.pdf');
-    const name = outPath.split(/[/\\]/).pop()!;
-    const baseUrl = request.nextUrl.origin;
-    return NextResponse.json({
-      downloadUrl: `${baseUrl}/api/download?f=${encodeURIComponent(name)}`,
-      filename: 'ocr.pdf',
-    });
+    return fileResponse(outBuf, 'ocr.pdf');
   } catch (e) {
     return NextResponse.json({
       error: e instanceof Error ? e.message : 'OCR failed.',

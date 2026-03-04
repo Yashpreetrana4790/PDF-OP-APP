@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PDFDocument } from 'pdf-lib';
-import { getFirstFile, saveUpload } from '@/lib/uploads';
+import { getFirstFile } from '@/lib/uploads';
+import { fileResponse } from '@/lib/response';
 
 function parseOrder(str: string, maxPage: number): number[] {
   const parts = String(str || '1,2,3').trim().split(/[\s,]+/);
@@ -30,13 +31,7 @@ export async function POST(request: NextRequest) {
     const pages = await newDoc.copyPages(doc, order);
     pages.forEach((p) => newDoc.addPage(p));
     const outBuf = Buffer.from(await newDoc.save());
-    const outPath = await saveUpload(outBuf, '-reorder.pdf');
-    const name = outPath.split(/[/\\]/).pop()!;
-    const baseUrl = request.nextUrl.origin;
-    return NextResponse.json({
-      downloadUrl: `${baseUrl}/api/download?f=${encodeURIComponent(name)}`,
-      filename: 'reordered.pdf',
-    });
+    return fileResponse(outBuf, 'reordered.pdf');
   } catch (e) {
     return NextResponse.json({
       error: e instanceof Error ? e.message : 'Reorder failed',

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PDFDocument } from 'pdf-lib';
-import { getFirstFile, saveUpload } from '@/lib/uploads';
+import { getFirstFile } from '@/lib/uploads';
+import { fileResponse } from '@/lib/response';
 import JSZip from 'jszip';
 
 export async function POST(request: NextRequest) {
@@ -26,13 +27,7 @@ export async function POST(request: NextRequest) {
       zip.file(`page-${i + 1}.pdf`, outBuf);
     }
     const zipBuf = await zip.generateAsync({ type: 'nodebuffer' });
-    const outPath = await saveUpload(Buffer.from(zipBuf), '-split.zip');
-    const name = outPath.split(/[/\\]/).pop()!;
-    const baseUrl = request.nextUrl.origin;
-    return NextResponse.json({
-      downloadUrl: `${baseUrl}/api/download?f=${encodeURIComponent(name)}`,
-      filename: 'split-pages.zip',
-    });
+    return fileResponse(Buffer.from(zipBuf), 'split-pages.zip');
   } catch (e) {
     return NextResponse.json({
       error: e instanceof Error ? e.message : 'Split failed',

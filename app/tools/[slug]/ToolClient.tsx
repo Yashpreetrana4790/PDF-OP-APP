@@ -63,11 +63,36 @@ export default function ToolClient({ tool }: ToolClientProps) {
         method: 'POST',
         body: formData,
       });
-      const data = await res.json().catch(() => ({}));
+      const contentType = res.headers.get('content-type') || '';
+      const isFile =
+        contentType.includes('application/pdf') ||
+        contentType.includes('application/zip') ||
+        contentType.includes('text/plain') ||
+        contentType.includes('application/vnd.') ||
+        contentType.includes('application/octet-stream');
+
       if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
         setError(data.error || res.statusText || 'Something went wrong.');
         return;
       }
+
+      if (isFile && res.ok) {
+        const blob = await res.blob();
+        const disp = res.headers.get('content-disposition') || '';
+        const match = disp.match(/filename="?([^";\n]+)"?/);
+        const filename = match ? match[1].trim() : 'download';
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+        setResult({ url: '', filename });
+        return;
+      }
+
+      const data = await res.json().catch(() => ({}));
       if (data.downloadUrl && data.filename) {
         setResult({ url: data.downloadUrl, filename: data.filename });
       } else if (data.message) {
@@ -114,10 +139,10 @@ export default function ToolClient({ tool }: ToolClientProps) {
 
         {!isTextOnly && (
           <FileDropZone
-            onFiles={(f) => setFiles((prev) => [...prev, ...f].slice(0, 20))}
+            onFiles={(f) => setFiles((prev) => [...prev, ...f].slice(0, tool.slug === 'compare-pdf' ? 2 : 20))}
             accept={accept}
-            multiple={tool.slug !== 'speech-to-pdf' && (tool.slug !== 'compare-pdf' || files.length < 2)}
-            maxFiles={tool.slug === 'merge-pdf' || tool.slug === 'compare-pdf' ? 20 : 10}
+            multiple={tool.slug !== 'speech-to-pdf'}
+            maxFiles={tool.slug === 'compare-pdf' ? 2 : tool.slug === 'merge-pdf' ? 20 : 10}
             label="Drag and drop files here or click to browse"
           />
         )}
@@ -291,10 +316,16 @@ export default function ToolClient({ tool }: ToolClientProps) {
 
         {result && (
           <div className={styles.result}>
-            <p className={styles.resultLabel}>Ready to download</p>
-            <a href={result.url} download={result.filename} className={styles.downloadBtn}>
-              Download {result.filename}
-            </a>
+            <p className={styles.resultLabel}>
+              {result.url ? 'Ready to download' : 'Downloaded'}
+            </p>
+            {result.url ? (
+              <a href={result.url} download={result.filename} className={styles.downloadBtn}>
+                Download {result.filename}
+              </a>
+            ) : (
+              <span className={styles.downloadBtn}>{result.filename}</span>
+            )}
           </div>
         )}
       </div>

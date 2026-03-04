@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getFirstFile, saveUpload } from '@/lib/uploads';
+import { getFirstFile } from '@/lib/uploads';
+import { fileResponse } from '@/lib/response';
 import { convertWithLibreOffice } from '@/lib/libreoffice';
 
 export async function POST(request: NextRequest) {
@@ -11,13 +12,7 @@ export async function POST(request: NextRequest) {
     }
     const ext = buffer[0] === 0x50 && buffer[1] === 0x4b ? '.pptx' : '.ppt';
     const outBuf = await convertWithLibreOffice(buffer, ext, 'pdf', 'ppt-to-pdf');
-    const outPath = await saveUpload(outBuf, '-converted.pdf');
-    const name = outPath.split(/[/\\]/).pop()!;
-    const baseUrl = request.nextUrl.origin;
-    return NextResponse.json({
-      downloadUrl: `${baseUrl}/api/download?f=${encodeURIComponent(name)}`,
-      filename: 'converted.pdf',
-    });
+    return fileResponse(outBuf, 'converted.pdf');
   } catch (e) {
     return NextResponse.json({
       error: e instanceof Error ? e.message : 'Conversion failed. Install LibreOffice for PPT to PDF.',

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getFirstFile, saveUpload } from '@/lib/uploads';
+import { getFirstFile } from '@/lib/uploads';
 import { protectPdf } from '@/lib/qpdf';
+import { fileResponse } from '@/lib/response';
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,13 +19,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Passwords do not match' }, { status: 400 });
     }
     const outBuf = await protectPdf(buffer, password);
-    const outPath = await saveUpload(outBuf, '-protected.pdf');
-    const name = outPath.split(/[/\\]/).pop()!;
-    const baseUrl = request.nextUrl.origin;
-    return NextResponse.json({
-      downloadUrl: `${baseUrl}/api/download?f=${encodeURIComponent(name)}`,
-      filename: 'protected.pdf',
-    });
+    return fileResponse(Buffer.from(outBuf), 'protected.pdf');
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : 'Protect failed';
     return NextResponse.json({ error: msg }, { status: 500 });

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PDFDocument } from 'pdf-lib';
-import { getFirstFile, saveUpload } from '@/lib/uploads';
+import { getFirstFile } from '@/lib/uploads';
+import { fileResponse } from '@/lib/response';
 
 function parseIndices(str: string, maxPage: number): number[] {
   const toDelete = new Set<number>();
@@ -39,13 +40,7 @@ export async function POST(request: NextRequest) {
     const pages = await newDoc.copyPages(doc, keep);
     pages.forEach((p) => newDoc.addPage(p));
     const outBuf = Buffer.from(await newDoc.save());
-    const outPath = await saveUpload(outBuf, '-deleted.pdf');
-    const name = outPath.split(/[/\\]/).pop()!;
-    const baseUrl = request.nextUrl.origin;
-    return NextResponse.json({
-      downloadUrl: `${baseUrl}/api/download?f=${encodeURIComponent(name)}`,
-      filename: 'document.pdf',
-    });
+    return fileResponse(outBuf, 'document.pdf');
   } catch (e) {
     return NextResponse.json({
       error: e instanceof Error ? e.message : 'Delete pages failed',

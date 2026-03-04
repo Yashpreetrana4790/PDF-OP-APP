@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PDFDocument } from 'pdf-lib';
-import { getFirstFile, saveUpload } from '@/lib/uploads';
+import { getFirstFile } from '@/lib/uploads';
+import { fileResponse } from '@/lib/response';
 
 export async function POST(request: NextRequest) {
   try {
@@ -34,13 +35,7 @@ export async function POST(request: NextRequest) {
       });
     }
     const outBuf = Buffer.from(await newDoc.save());
-    const outPath = await saveUpload(outBuf, '-resized.pdf');
-    const name = outPath.split(/[/\\]/).pop()!;
-    const baseUrl = request.nextUrl.origin;
-    return NextResponse.json({
-      downloadUrl: `${baseUrl}/api/download?f=${encodeURIComponent(name)}`,
-      filename: 'resized.pdf',
-    });
+    return fileResponse(outBuf, 'resized.pdf');
   } catch (e) {
     return NextResponse.json({
       error: e instanceof Error ? e.message : 'Resize failed',

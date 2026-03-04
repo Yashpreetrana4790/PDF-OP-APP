@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PDFDocument } from 'pdf-lib';
-import { getFirstFile, saveUpload } from '@/lib/uploads';
+import { getFirstFile } from '@/lib/uploads';
+import { fileResponse } from '@/lib/response';
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,13 +20,7 @@ export async function POST(request: NextRequest) {
       if (t.length > 1 && !/^[\d\s]+$/.test(t)) lines.push(t);
     }
     const text = lines.length > 2 ? lines.join('\n') : `PDF (${pageCount} pages). For better text extraction use the OCR tool with images.`;
-    const outPath = await saveUpload(Buffer.from(text, 'utf-8'), '-text.txt');
-    const name = outPath.split(/[/\\]/).pop()!;
-    const baseUrl = request.nextUrl.origin;
-    return NextResponse.json({
-      downloadUrl: `${baseUrl}/api/download?f=${encodeURIComponent(name)}`,
-      filename: 'extracted.txt',
-    });
+    return fileResponse(Buffer.from(text, 'utf-8'), 'extracted.txt');
   } catch (e) {
     return NextResponse.json({
       error: e instanceof Error ? e.message : 'Extract text failed',

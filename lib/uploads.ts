@@ -2,7 +2,10 @@ import { writeFile, mkdir, readFile, unlink, readdir } from 'fs/promises';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
-const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
+const UPLOADS_DIR =
+  process.env.VERCEL === '1'
+    ? path.join('/tmp', 'uploads')
+    : path.join(process.cwd(), 'uploads');
 const MAX_AGE_MS = 30 * 60 * 1000; // 30 minutes
 
 export async function ensureUploadsDir() {

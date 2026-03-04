@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PDFDocument } from 'pdf-lib';
-import { getFilesFromFormData, saveUpload, getUploadPath, deleteFile } from '@/lib/uploads';
+import { getFilesFromFormData } from '@/lib/uploads';
+import { fileResponse } from '@/lib/response';
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,13 +18,7 @@ export async function POST(request: NextRequest) {
       pages.forEach((p) => merged.addPage(p));
     }
     const outBuf = Buffer.from(await merged.save());
-    const outPath = await saveUpload(outBuf, '-merged.pdf');
-    const name = outPath.split(/[/\\]/).pop()!;
-    const baseUrl = request.nextUrl.origin;
-    return NextResponse.json({
-      downloadUrl: `${baseUrl}/api/download?f=${encodeURIComponent(name)}`,
-      filename: 'merged.pdf',
-    });
+    return fileResponse(outBuf, 'merged.pdf');
   } catch (e) {
     return NextResponse.json({
       error: e instanceof Error ? e.message : 'Merge failed',
