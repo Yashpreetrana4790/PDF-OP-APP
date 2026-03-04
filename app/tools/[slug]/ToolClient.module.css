@@ -1,0 +1,201 @@
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+
+.breadcrumb {
+  font-size: 0.9rem;
+  color: var(--gray-700);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.breadcrumb a:hover {
+  color: var(--red-primary);
+}
+
+.card {
+  background: var(--white);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 32px;
+  border: 1px solid var(--gray-200);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 8px;
+}
+
+.desc {
+  font-size: 1rem;
+  color: var(--gray-700);
+}
+
+.fileList {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fileItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--gray-50);
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.fileName {
+  color: var(--gray-900);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.removeBtn {
+  background: none;
+  border: none;
+  color: var(--gray-700);
+  font-size: 1.25rem;
+  line-height: 1;
+  padding: 0 4px;
+  transition: color 0.2s;
+}
+
+.removeBtn:hover {
+  color: var(--red-primary);
+}
+
+.extra {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.extra label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--gray-900);
+}
+
+.input {
+  padding: 10px 14px;
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--red-primary);
+}
+
+.error {
+  margin-top: 16px;
+  padding: 12px;
+  background: rgba(229, 57, 53, 0.1);
+  color: var(--red-dark);
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.actions {
+  margin-top: 24px;
+}
+
+.primaryBtn {
+  width: 100%;
+  padding: 14px 24px;
+  background: var(--red-primary);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.primaryBtn:hover:not(:disabled) {
+  background: var(--red-dark);
+  transform: translateY(-1px);
+}
+
+.primaryBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.result {
+  margin-top: 24px;
+  padding: 20px;
+  background: var(--gray-50);
+  border-radius: 12px;
+  text-align: center;
+}
+
+.resultLabel {
+  font-size: 0.9rem;
+  color: var(--gray-700);
+  margin-bottom: 12px;
+}
+
+.textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 120px;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--red-primary);
+}
+
+.messageText {
+  font-size: 0.95rem;
+  color: var(--gray-900);
+  margin: 0;
+}
+
+.downloadBtn {
+  display: inline-block;
+  padding: 12px 24px;
+  background: var(--red-primary);
+  color: var(--white);
+  border-radius: 8px;
+  font-weight: 600;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.downloadBtn:hover {
+  background: var(--red-dark);
+  transform: translateY(-1px);
+}
