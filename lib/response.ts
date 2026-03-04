@@ -12,7 +12,8 @@ const MIME_NAMES: Record<string, string> = {
 export function fileResponse(buffer: Buffer, filename: string, mime?: string): NextResponse {
   const ext = filename.includes('.') ? filename.split('.').pop()!.toLowerCase() : 'pdf';
   const contentType = mime || MIME_NAMES[ext] || 'application/octet-stream';
-  return new NextResponse(buffer, {
+  const body = new Uint8Array(buffer);
+  return new NextResponse(body, {
     headers: {
       'Content-Type': contentType,
       'Content-Disposition': `attachment; filename="${filename}"`,
