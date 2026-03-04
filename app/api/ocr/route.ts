@@ -27,12 +27,15 @@ export async function POST(request: NextRequest) {
         continue;
       }
       const image = await sharp(imgBuf).png().toBuffer();
+      const meta = await sharp(image).metadata();
+      const imgW = meta.width ?? 612;
+      const imgH = meta.height ?? 792;
+      const scale = 72 / 96;
+      const w = imgW * scale;
+      const h = imgH * scale;
+      const page = outDoc.addPage([w, h]);
       const { data } = await Tesseract.recognize(image, 'eng', { logger: () => {} });
       const text = data.text?.trim() || '';
-      const scale = 72 / 96;
-      const w = Math.min(612, (data.width || 612) * scale);
-      const h = Math.min(792, (data.height || 792) * scale);
-      const page = outDoc.addPage([w, h]);
       const embed = await outDoc.embedPng(image);
       page.drawImage(embed, { x: 0, y: 0, width: w, height: h });
       const fontSize = 12;
